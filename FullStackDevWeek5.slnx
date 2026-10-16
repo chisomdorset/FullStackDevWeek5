@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="FullStackDevWeek5/FullStackDevWeek5.csproj" />
+  <Project Path="FullStackDevWeek5Test/FullStackDevWeek5Test.csproj" />
 </Solution>

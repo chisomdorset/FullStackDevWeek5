@@ -1,0 +1,102 @@
+﻿@page "/createproduct"
+
+@using FullStackDevWeek5.Models
+@using FullStackDevWeek5.Services
+
+@inject ProductService ProductService
+
+@rendermode InteractiveServer
+
+ 
+<h3>Create Product</h3>
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="alert alert-success mt-3">
+        @Message
+    </div>
+}
+
+
+ 
+<EditForm Model="@product" OnValidSubmit="SaveProduct">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Product Name</label>
+
+        <InputText class="form-control"
+                   @bind-Value="product.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+
+        <InputText class="form-control"
+                   @bind-Value="product.Description" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Price</label>
+
+        <InputNumber class="form-control"
+                     @bind-Value="product.Price" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Quantity in Stock</label>
+
+        <InputNumber class="form-control"
+                     @bind-Value="product.QuantityInStock" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+
+        <InputSelect class="form-control"
+                     @bind-Value="product.Category">
+
+            <option value="">Select Category</option>
+            <option>Electronics</option>
+            <option>Books</option>
+            <option>Clothing</option>
+            <option>Sports</option>
+            <option>Home & Garden</option>
+
+        </InputSelect>
+    </div>
+
+ 
+
+    <button class="btn btn-primary">
+        Save Product
+    </button>
+
+</EditForm>
+
+ 
+
+@code {
+
+    [Parameter]
+    public Product product { get; set; } = null;
+
+    private string Message = "";
+
+    private async Task SaveProduct()
+    {
+        var productReturn = await ProductService.AddProductAsync(product);
+
+        if (productReturn != null)
+        {
+            Message = "Product created successfully";
+
+            product = new Product();
+        }
+        else
+        {
+            Message = "Failed to create product";
+        }
+    }
+}

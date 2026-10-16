@@ -1,0 +1,200 @@
+﻿@page "/schools"
+@rendermode InteractiveServer
+
+@inject NavigationManager Nav
+@using FullStackDevWeek5.Models
+@using FullStackDevWeek5.Components
+@using FullStackDevWeek5.Services
+@inject SchoolService SchoolService
+
+
+<h3>School List</h3>
+
+<div class="mb-3">
+    <button class="btn btn-success"
+            @onclick='() => Nav.NavigateTo("/createschool")'>
+        <i class="bi bi-plus-circle"></i>
+        Add New School
+    </button>
+</div>
+
+<div class="row mb-3">
+
+    <div class="col-md-4">
+        <input class="form-control"
+               placeholder="Search by Name, Category or Description..."
+               @bind="searchText"
+               @bind:event="oninput" />
+    </div>
+
+    <div class="col-md-8 text-end">
+        <h5>
+            Total Schools: @schools.Count |
+            Found: @FilteredSchools.Count()
+        </h5>
+    </div>
+
+</div>
+
+@if (schools.Count == 0)
+{
+    <div class="alert alert-info">
+        Loading schools...
+    </div>
+}
+else if (!FilteredSchools.Any())
+{
+    <div class="alert alert-warning">
+        No schools found matching "@searchText"
+    </div>
+}
+else
+{
+    <div class="table-responsive shadow-sm rounded-3">
+
+        <table class="table table-hover table-striped align-middle">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>School Id</th>
+                    <th>SchoolName</th>
+                    <th>Address</th>
+                    <th>Phone Number</th>
+                    <th>EmailAddress</th>
+                    <th>Proprietor Full Name</th>
+                    <th>Head Full Name</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var school in FilteredSchools)
+                {
+                    <tr>
+
+                        <td>@school.SchoolId</td>
+                        <td>@school.SchoolName</td>
+                        <td>@school.Address</td>
+                        <td>@school.PhoneNo</td>
+                        <td>@school.EmailAddress</td>
+                        <td>@school.ProprietorFullName</td>
+                        <td>@school.HeadFullName</td>
+                       
+
+                        <td class="text-center">
+
+                            <div class="row">
+
+                                <button class="btn btn-sm btn-primary me-1"
+                                        title="View"
+                                        @onclick="() => ViewSchool(school.SchoolId)">
+                                    <i class="bi bi-eye"></i>
+                                    View
+                                </button>
+                            </div>
+
+                            <div class="row">
+                                <button class="btn btn-sm btn-warning me-1"
+                                        title="Edit"
+                                        @onclick="() => EditSchool(school.SchoolId)">
+                                    <i class="bi bi-pencil-square"></i>
+                                    Edit
+                                </button>
+                            </div>
+
+                            <div class="row">
+                                <button class="btn btn-sm btn-danger"
+                                        title="Delete"
+                                        @onclick="() => DeleteSchool(school.SchoolId)">
+                                    <i class="bi bi-trash"></i>
+                                    Delete
+                                </button>
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
+
+
+
+@code {
+
+    [Parameter]
+    public List<School> schools { get; set; } = new();
+
+    private string searchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            schools = (await SchoolService.GetSchoolsAsync()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private IEnumerable<School> FilteredSchools =>
+    schools.Where(s =>
+    string.IsNullOrWhiteSpace(searchText) ||
+
+    (s.SchoolName?.Contains(
+    searchText,
+    StringComparison.OrdinalIgnoreCase) ?? false)
+
+    ||
+
+    (s.Address?.Contains(
+    searchText,
+    StringComparison.OrdinalIgnoreCase) ?? false)
+
+    ||
+
+    (s.HeadFullName?.Contains(
+    searchText,
+    StringComparison.OrdinalIgnoreCase) ?? false)
+    );
+
+    private void ViewSchool(int schoolId)
+    {
+        Nav.NavigateTo($"/school/view/{schoolId}");
+    }
+
+    private void EditSchool(int schoolId)
+    {
+        Nav.NavigateTo($"/editschool/{schoolId}");
+    }
+
+    private async Task DeleteSchool(int schoolId)
+    {
+        try
+        {
+        
+
+            var item = schools.FirstOrDefault(s => s.SchoolId == schoolId);
+
+            if (item != null)
+            {
+                schools.Remove(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        await Task.CompletedTask;
+    }
+
+}

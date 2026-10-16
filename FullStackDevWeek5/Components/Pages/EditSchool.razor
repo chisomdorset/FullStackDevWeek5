@@ -1,0 +1,118 @@
+﻿
+
+@page "/editschool/{SchoolId:int}"
+ 
+@using FullStackDevWeek5.Models
+@using FullStackDevWeek5.Services
+ 
+@inject SchoolService SchoolService
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+ 
+<h3>Edit School</h3>
+ 
+@if (school == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="alert alert-success mt-3">
+            @Message
+        </div>
+    }
+
+    <EditForm Model="school" OnValidSubmit="UpdateSchool">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">School Name</label>
+            <InputText class="form-control"
+            @bind-Value="school.SchoolName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+            <InputText class="form-control"
+            @bind-Value="school.Address" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <InputText class="form-control"
+            @bind-Value="school.PhoneNo" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <InputText class="form-control"
+            @bind-Value="school.EmailAddress" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Proprietor Full Name</label>
+            <InputText class="form-control"
+            @bind-Value="school.ProprietorFullName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Head Full Name</label>
+            <InputText class="form-control"
+            @bind-Value="school.HeadFullName" />
+        </div>
+
+        <button type="submit"
+        class="btn btn-primary">
+            Update School
+        </button>
+
+        <button type="button"
+        class="btn btn-secondary ms-2"
+        @onclick="Cancel">
+            Cancel
+        </button>
+
+    </EditForm>
+
+
+}
+
+@code {
+
+    [Parameter]
+    public int SchoolId { get; set; }
+
+    private School? school;
+
+    private string Message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+            school = await SchoolService.GetSchoolByIdAsync(SchoolId);
+    }
+
+    private async Task UpdateSchool()
+    {
+        var returnVal = await SchoolService.UpdateSchoolAsync(school);
+
+        if (returnVal != null)
+        {
+            Message = "School updated successfully";
+        }
+        else
+        {
+            Message = "Update failed";
+        }
+    }
+
+    private void Cancel()
+    {
+    Navigation.NavigateTo("/schools");
+    }
+}

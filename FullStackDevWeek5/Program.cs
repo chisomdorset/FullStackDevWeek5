@@ -1,4 +1,5 @@
 using FullStackDevWeek5.Components;
+using FullStackDevWeek5.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<SchoolService>();
+
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
